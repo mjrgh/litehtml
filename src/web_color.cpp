@@ -154,7 +154,7 @@ litehtml::def_color litehtml::g_def_colors[] =
 };
 
 
-litehtml::web_color litehtml::web_color::from_string(const tchar_t* str, litehtml::document_container* callback)
+litehtml::web_color litehtml::web_color::from_string(const tchar_t* str, std::shared_ptr<litehtml::document_container> callback)
 {
 	if(!str || !str[0])
 	{
@@ -225,7 +225,7 @@ litehtml::web_color litehtml::web_color::from_string(const tchar_t* str, litehtm
 	return web_color(0, 0, 0);
 }
 
-litehtml::tstring litehtml::web_color::resolve_name(const tchar_t* name, litehtml::document_container* callback)
+litehtml::tstring litehtml::web_color::resolve_name(const tchar_t* name, std::shared_ptr<litehtml::document_container> callback)
 {
 	for(int i=0; g_def_colors[i].name; i++)
 	{

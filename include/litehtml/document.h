@@ -55,7 +55,7 @@ namespace litehtml
 		typedef std::weak_ptr<document>		weak_ptr;
 	private:
 		std::shared_ptr<element>			m_root;
-		document_container*					m_container;
+		std::shared_ptr<document_container>	m_container;
 		fonts_map							m_fonts;
 		css_text::vector					m_css;
 		litehtml::css						m_styles;
@@ -70,10 +70,10 @@ namespace litehtml
 		tstring                             m_lang;
 		tstring                             m_culture;
 	public:
-		document(litehtml::document_container* objContainer, litehtml::context* ctx);
+		document(std::shared_ptr<litehtml::document_container> objContainer, litehtml::context* ctx);
 		virtual ~document();
 
-		litehtml::document_container*	container()	{ return m_container; }
+		std::shared_ptr<litehtml::document_container> container()	{ return m_container; }
 		uint_ptr						get_font(const tchar_t* name, int size, const tchar_t* weight, const tchar_t* style, const tchar_t* decoration, font_metrics* fm);
 		int								render(int max_width, render_type rt = render_all);
 		void							draw(uint_ptr hdc, int x, int y, const position* clip);
@@ -101,8 +101,8 @@ namespace litehtml
 		void                            append_children_from_string(element& parent, const tchar_t* str);
 		void                            append_children_from_utf8(element& parent, const char* str);
 
-		static litehtml::document::ptr createFromString(const tchar_t* str, litehtml::document_container* objPainter, litehtml::context* ctx, litehtml::css* user_styles = 0);
-		static litehtml::document::ptr createFromUTF8(const char* str, litehtml::document_container* objPainter, litehtml::context* ctx, litehtml::css* user_styles = 0);
+		static litehtml::document::ptr createFromString(const tchar_t* str, std::shared_ptr<litehtml::document_container> objPainter, litehtml::context* ctx, litehtml::css* user_styles = 0);
+		static litehtml::document::ptr createFromUTF8(const char* str, std::shared_ptr<litehtml::document_container> objPainter, litehtml::context* ctx, litehtml::css* user_styles = 0);
 	
 	private:
 		litehtml::uint_ptr	add_font(const tchar_t* name, int size, const tchar_t* weight, const tchar_t* style, const tchar_t* decoration, font_metrics* fm);

@@ -28,7 +28,7 @@
 #include "gumbo.h"
 #include "utf8_strings.h"
 
-litehtml::document::document(litehtml::document_container* objContainer, litehtml::context* ctx)
+litehtml::document::document(std::shared_ptr<litehtml::document_container> objContainer, litehtml::context* ctx)
 {
 	m_container	= objContainer;
 	m_context	= ctx;
@@ -46,12 +46,12 @@ litehtml::document::~document()
 	}
 }
 
-litehtml::document::ptr litehtml::document::createFromString( const tchar_t* str, litehtml::document_container* objPainter, litehtml::context* ctx, litehtml::css* user_styles)
+litehtml::document::ptr litehtml::document::createFromString( const tchar_t* str, std::shared_ptr<litehtml::document_container> objPainter, litehtml::context* ctx, litehtml::css* user_styles)
 {
 	return createFromUTF8(litehtml_to_utf8(str), objPainter, ctx, user_styles);
 }
 
-litehtml::document::ptr litehtml::document::createFromUTF8(const char* str, litehtml::document_container* objPainter, litehtml::context* ctx, litehtml::css* user_styles)
+litehtml::document::ptr litehtml::document::createFromUTF8(const char* str, std::shared_ptr<litehtml::document_container> objPainter, litehtml::context* ctx, litehtml::css* user_styles)
 {
 	// parse document into GumboOutput
 	GumboOutput* output = gumbo_parse((const char*) str);

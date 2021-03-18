@@ -159,7 +159,7 @@ void litehtml::css::parse_atrule(const tstring& text, const tchar_t* baseurl, co
 			tokens.erase(tokens.begin());
 			if(doc)
 			{
-				document_container* doc_cont = doc->container();
+				std::shared_ptr<document_container> doc_cont = doc->container();
 				if(doc_cont)
 				{
 					tstring css_text;
