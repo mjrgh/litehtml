@@ -481,6 +481,7 @@ void litehtml::style::parse_short_background( const tstring& val, const tchar_t*
 	add_parsed_property(_t("background-origin"),		_t("padding-box"),	important);
 	add_parsed_property(_t("background-clip"),			_t("border-box"),	important);
 	add_parsed_property(_t("background-attachment"),	_t("scroll"),		important);
+	add_parsed_property(_t("background-size"),			_t(""),				important);
 
 	if(val == _t("none"))
 	{
@@ -490,6 +491,7 @@ void litehtml::style::parse_short_background( const tstring& val, const tchar_t*
 	string_vector tokens;
 	split_string(val, tokens, _t(" "), _t(""), _t("("));
 	bool origin_found = false;
+    bool found_slash = false;
 	for(string_vector::iterator tok = tokens.begin(); tok != tokens.end(); tok++)
 	{
 		if(tok->substr(0, 3) == _t("url"))
@@ -516,19 +518,63 @@ void litehtml::style::parse_short_background( const tstring& val, const tchar_t*
 			{
 				add_parsed_property(_t("background-clip"),*tok, important);
 			}
+		} else if( value_in_list(tok->c_str(), background_size_strings) )
+		{
+			if(m_properties.find(_t("background-size")) != m_properties.end())
+			{
+				m_properties[_t("background-size")].m_value = m_properties[_t("background-size")].m_value + _t(" ") + *tok;
+			} else
+			{
+				add_parsed_property(_t("background-size"), *tok, important);
+			}
+		} else if ((*tok)[0] == _t('/')) {
+			found_slash = true;
+			if (*tok != _t("/")) {
+				auto sizTok = tok->substr(1);
+				if (m_properties.find(_t("background-size")) != m_properties.end()) {
+					m_properties[_t("background-size")].m_value = m_properties[_t("background-size")].m_value + _t(" ") + sizTok;
+				} else
+				{
+					add_parsed_property(_t("background-size"), sizTok, important);
+				}
+			}
 		} else if(	value_in_list(tok->c_str(), _t("left;right;top;bottom;center")) ||
 					iswdigit((*tok)[0]) ||
 					(*tok)[0] == _t('-')	||
 					(*tok)[0] == _t('.')	||
 					(*tok)[0] == _t('+'))
 		{
-			if(m_properties.find(_t("background-position")) != m_properties.end())
+			auto posTok = *tok;
+            auto slash = posTok.find(_t('/'));
+            if (slash != tstring::npos && !found_slash)
 			{
-				m_properties[_t("background-position")].m_value = m_properties[_t("background-position")].m_value + _t(" ") + *tok;
-			} else
-			{
-				add_parsed_property(_t("background-position"), *tok, important);
+				found_slash = true;
+				if (m_properties.find(_t("background-size")) != m_properties.end()) {
+					m_properties[_t("background-size")].m_value = m_properties[_t("background-size")].m_value + _t(" ") + posTok.substr(slash + 1);
+				} else
+				{
+					add_parsed_property(_t("background-size"), posTok.substr(slash + 1), important);
+				}
+				posTok = posTok.substr(0, slash);
+            } 
+			
+			if (found_slash && (iswdigit((*tok)[0]) || (*tok)[0] == _t('-') || (*tok)[0] == _t('.') || (*tok)[0] == _t('+'))) {
+				if (m_properties.find(_t("background-size")) != m_properties.end()) {
+					m_properties[_t("background-size")].m_value = m_properties[_t("background-size")].m_value + _t(" ") + posTok.substr(slash + 1);
+				} else {
+					add_parsed_property(_t("background-size"), posTok.substr(slash + 1), important);
+				}
 			}
+
+			if (posTok.length() != 0) {
+				if(m_properties.find(_t("background-position")) != m_properties.end())
+				{
+					m_properties[_t("background-position")].m_value = m_properties[_t("background-position")].m_value + _t(" ") + posTok;
+				} else
+				{
+					add_parsed_property(_t("background-position"), posTok, important);
+				}
+            }
 		} else if (web_color::is_color(tok->c_str()))
 		{
 			add_parsed_property(_t("background-color"), *tok, important);
